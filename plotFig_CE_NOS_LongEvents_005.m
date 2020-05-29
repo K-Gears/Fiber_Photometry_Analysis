@@ -83,21 +83,14 @@ for dataNum=1:size(dataTypes,1)
     end
     
     %% Ten second events same plot
-    if dataNum==1
-        lgndVals=[];
-    end
     figure(34); hold on;
     colororder({'g','m'});
     yyaxis left;plot(FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).PlotTime,FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).GCaMP,'Color',thegreens{dataNum},'LineStyle','-','Marker','none');
     ylabel('Z-units');
     yyaxis right;plot(FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).PlotTime,FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).CBV,'Color',thereds{dataNum},'LineStyle','-','Marker','none');
     xlim([-5 10]); xlabel('Time(sec)'); ylabel('Z-units');title(' Population Average ten second locomotion evoked change ');
-    TempTxt=strrep(dataTypes{dataNum},'_',' ');
-    CBVTxt{1,(dataNum)}=[TempTxt ' blood volume'];
-    GCaMPTxt{1,(dataNum)}=[TempTxt ' GCaMP'];
-    
+
     if dataNum==length(dataTypes)
-        lgndVals=[lgndVals,GCaMPTxt,CBVTxt];
         legend(lgndVals);
 %         savefig(gcf,['Population_TenSecond_CBV_GFP_Evoked_Plots_' theDate]);
 %         saveas(gcf,['Population_TenSecond_CBV_GFP_Evoked_Plots_' theDate],'epsc');
@@ -105,21 +98,14 @@ for dataNum=1:size(dataTypes,1)
     
     
     %% Thirty second events same plot
-    if dataNum==1
-        lgndVals=[];
-    end
     figure(35); hold on;
     colororder({'g','m'});
     yyaxis left;plot(FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).PlotTime,FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).GCaMP,'Color',thegreens{dataNum},'LineStyle','-','Marker','none');
     ylabel('Z-units');
     yyaxis right;plot(FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).PlotTime,FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).CBV,'Color',thereds{dataNum},'LineStyle','-','Marker','none');
     xlim([-5 30]); xlabel('Time(sec)'); ylabel('Z-units');title(' Population Average thirty second locomotion evoked change ');
-    TempTxt=strrep(dataTypes{dataNum},'_',' ');
-    CBVTxt{1,(dataNum)}=[TempTxt ' blood volume'];
-    GCaMPTxt{1,(dataNum)}=[TempTxt ' GCaMP'];
     
     if dataNum==length(dataTypes)
-        lgndVals=[lgndVals,GCaMPTxt,CBVTxt];
         legend(lgndVals);
 %         savefig(gcf,['Population_ThirtySecond_CBV_GFP_Evoked_Plots_' theDate]);
 %         saveas(gcf,['Population_ThirtySecond_CBV_GFP_Evoked_Plots_' theDate],'epsc');
