@@ -268,6 +268,9 @@ if ~isempty(LocomotionEvents)
     ChunkData.AveragedData.(StateLabel{stateNum}).All.BaseResp=BaseResp;
     ChunkData.AveragedData.(StateLabel{stateNum}).All.PeakResp=PeakResp;
     ChunkData.AveragedData.(StateLabel{stateNum}).All.RespVol=sum(AverageLocomotionResponse((ChunkData.Params.StartPad:end),:),1)/length(AverageLocomotionResponse((ChunkData.Params.StartPad:end),1));
+    if strcmpi(StateLabel{stateNum},'SteadyState')
+    ChunkData.AveragedData.(StateLabel{stateNum}).All.ZeroedRespVol=ChunkData.AveragedData.SteadyState.All.RespVol-ChunkData.AveragedData.PreInjection.All.RespVol;
+    end
     ChunkData.LocomotionEvokedData.(StateLabel{stateNum}).All.OpticalData=LocomotionEvents;
 else
     ChunkData.WheelData.(StateLabel{stateNum}).All.RunInds=[];

@@ -114,7 +114,7 @@ for injNum=1:size(injectionTypes,2)
     for genNum=1:size(Genotypes,2)
         filFind=strcmpi(AnimalGroup,Genotypes{genNum});
         genotypeAnimals=TempAnimals(filFind);
-        for anNum=1:size(TempAnimals,1)
+        for anNum=1:size(genotypeAnimals,1)
             thebreaks=strfind(genotypeAnimals(anNum).name,'_');
             fiberDepth{anNum}=genotypeAnimals(anNum).name((thebreaks(5)+1):(thebreaks(6)-1));
         end
@@ -128,8 +128,11 @@ for injNum=1:size(injectionTypes,2)
     [GroupedData]=AssemblePopulationData_Pharmacology(theAnimals,popDir,injectionTypes{injNum},Genotypes{genNum},Depths{depthNum},GroupedData);
     end
     clear fiberDepth
+    clear genotypeAnimals
+    clear theAnimals
     end
     clear AnimalGroup
+    clear TempAnimals
 end
 clear Injection
 
