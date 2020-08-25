@@ -1,4 +1,8 @@
 function [coeffVals,theEqn,goodness,stats]=Calibrate_Correction(filename)
+% READ ME
+% This function uses data collected from CAG-EGFP mice to estimate how much
+% attenuation of GFP occurs due to changes in blood volume
+
 close all
 directory=cd;
 folderBreaks=strfind(directory,'\');

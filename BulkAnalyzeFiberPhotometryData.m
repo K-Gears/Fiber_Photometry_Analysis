@@ -1,4 +1,16 @@
 function BulkAnalyzeFiberPhotometryData
+%READ ME
+%This is the master function used to convert data recorded using the Doric
+%imaging systems fiberphotometry system (output is a .csv file) in to
+%matlab datasets and figures for publication.
+%Functions called:
+%Calibrate_Correction
+%ExtractFPdata_003
+%FiberGroupAnimal
+%AssemblePopulationData_002
+%CreatePlotStruct
+%MakeDataTable_002
+%GLME_FiberData_Fixed
 
 Home='H:\DoricData';
 GFPDir='H:\DoricData\CAG_eGFP';
