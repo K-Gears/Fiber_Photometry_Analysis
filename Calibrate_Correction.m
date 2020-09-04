@@ -47,7 +47,7 @@ WheelData=filtfilt(sos_ball,g_ball,detrend(RawData(:,ChunkData.Params.VelocityCh
 RawData=RawData(:,DataChannels); %(5*ChunkData.Params.DataFs):(end-(5*ChunkData.Params.DataFs))
 
 %% Find Locomotion points to exclude from baseline calculations
-[imp_bin]=velocity_binarize(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-3);
+[imp_bin]=velocity_binarize_fiberphotometry(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-3);
 FuseGaps=15*ChunkData.Params.DataFs;
 bin_Run=double(imp_bin);
 RunInds=find(bin_Run==1);

@@ -62,7 +62,7 @@ WheelData=filtfilt(sos_ball,g_ball,detrend(RawData(:,ChunkData.Params.VelocityCh
 RawData=RawData(:,DataChannels); %(5*ChunkData.Params.DataFs):(end-(5*ChunkData.Params.DataFs))
 
 %% Find Locomotion points to exclude from baseline calculations
-[imp_bin]=velocity_binarize(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-3);
+[imp_bin]=velocity_binarize_fiberphotometry(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-3);
 FuseGaps=15*ChunkData.Params.DataFs;
 bin_Run=double(imp_bin);
 RunInds=find(bin_Run==1);
@@ -85,17 +85,17 @@ FiltData=filtfilt(sos_Fit,g_Fit,RawData); %Low pass filter data below 0.05Hz bef
 [fitVals]=fit(Spacing',RawData(:,3),'exp2','Exclude',ExcludeVals);
 coeffVals=coeffvalues(fitVals);
 predictedCBV=(coeffVals(1)*exp((coeffVals(2).*Spacing)))+(coeffVals(3)*exp((coeffVals(4).*Spacing))); 
-% figTime=(1:length(RawData(:,3)))/ChunkData.Params.DataFs;
-% figure(1);plot(figTime,RawData(:,3)); hold on; plot(figTime,predictedCBV); plot(figTime,FiltData(:,3));title('Exponential fit of TRITC metabolism'); xlabel('Time (sec)'); legend({'Raw TRITC brightness','Exponential Fit','Low pass filtered data fit'}); xlim([0 figTime(end)]);
-% xticks(1:900:figTime(length(figTime)));
+ figTime=(1:length(RawData(:,3)))/ChunkData.Params.DataFs;
+ figure(1);plot(figTime,RawData(:,3)); hold on; plot(figTime,predictedCBV); plot(figTime,FiltData(:,3));title('Exponential fit of TRITC metabolism'); xlabel('Time (sec)'); legend({'Raw TRITC brightness','Exponential Fit','Low pass filtered data fit'}); xlim([0 figTime(end)]);
+ xticks(1:900:figTime(length(figTime)));
 CorrectedCBV=RawData(:,3)-predictedCBV';
 FitStruct.CBV=fitVals;
 % Correct Ca2+ dependent GCaMP
 [fitVals]=fit(Spacing',RawData(:,2),'exp2','Exclude',ExcludeVals);
 coeffVals=coeffvalues(fitVals);
 predictedGCaMP=(coeffVals(1)*exp((coeffVals(2).*Spacing)))+(coeffVals(3)*exp((coeffVals(4).*Spacing))); 
-% figure(5);plot(figTime,RawData(:,2)); hold on; plot(figTime,predictedGCaMP);plot(figTime,FiltData(:,2)); title('Exponential fit of GCaMP6s photobleaching'); xlabel('Time (sec)'); legend({'Raw GCaMP brightness','Exponential Fit','Low pass filtered data fit'}); xlim([0 figTime(end)]);
-% xticks(1:900:figTime(length(figTime)));
+ figure(5);plot(figTime,RawData(:,2)); hold on; plot(figTime,predictedGCaMP);plot(figTime,FiltData(:,2)); title('Exponential fit of GCaMP6s photobleaching'); xlabel('Time (sec)'); legend({'Raw GCaMP brightness','Exponential Fit','Low pass filtered data fit'}); xlim([0 figTime(end)]);
+ xticks(1:900:figTime(length(figTime)));
 CorrectedGCaMP=RawData(:,2)-predictedGCaMP';
 FitStruct.GCaMP=fitVals;
 % Correct Ca2+ independent GCaMP
@@ -191,10 +191,10 @@ LowPassData=LowPassData((StartInd:end),:);
 params.fpass=[0.01 0.5];
 params.tapers=[19 37];
 
-[C,phi,S12,S1,S2,f]=coherencyc(Z560,Z465,params);
-ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
-ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
-ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
+% [C,phi,S12,S1,S2,f]=coherencyc(Z560,Z465,params);
+% ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
+% ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
+% ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
 
 % [C,phi,S12,S1,S2,f]=coherencyc(ZscoredFiberData(:,3),ZscoredFiberData(:,1),params);
 % ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{1}])=C;
@@ -207,7 +207,7 @@ ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChann
 % ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{2} '_' OpticalChannelNames{1}])=f;
 
 %% Binarize locomotion data
-[imp_bin]=velocity_binarize(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-4);
+[imp_bin]=velocity_binarize_fiberphotometry(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-4);
 
 %% Cross correlation analysis
 ExpectedLength=ChunkData.Params.DataFs*ChunkData.Params.DataSeconds;
@@ -226,7 +226,7 @@ maxLag=60*ChunkData.Params.DataFs; %Calculate cross correlation with +/- 5s lags
 RunDuration=[5 10 15 30 45];
 RunLengths={'five_second_events','ten_second_events','fifteen_second_events','thirty_second_events','fortyfive_second_events'};
 LeadTime=5;    
-[~,~,new_T_run]=motion_cont_2(imp_bin,ChunkData.Params.DataFs,RunDuration(1),LeadTime);
+[~,~,new_T_run]=motion_cont_fiberphotometry(imp_bin,ChunkData.Params.DataFs,RunDuration(1),LeadTime);
 EventLengths=(new_T_run(2,:)-new_T_run(1,:))/ChunkData.Params.DataFs;
 for durNum=1:length(RunDuration)
     LocomotionEvents=[];

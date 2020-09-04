@@ -1,10 +1,10 @@
 function BulkAnalyzeFiberPhotometryData
 
-Home='H:\DoricData';
-GFPDir='H:\DoricData\CAG_eGFP';
+Home='E:\DoricData';
+GFPDir='E:\DoricData\CAG_eGFP';
 AnalogChannelNames={'RotaryEncoder'};
 OpticalChannelNames={'Control','GCaMP6s','BloodVolume'};
-popDir='H:\DoricData\PopulationData';
+popDir='E:\DoricData\PopulationData';
 %% Get correction for Hemodynamic attenuation of GFP signal
 cd(GFPDir);
 depthFolders=dir;
@@ -15,7 +15,7 @@ for foldNum=1:size(depthFolders)
     cd([depthFolders(foldNum).folder '\' depthFolders(foldNum).name]);
     TheFiles=dir(fullfile([depthFolders(foldNum).folder '\' depthFolders(foldNum).name],'**','*.csv'));
     for fileNum=1:size(TheFiles,1)
-        if ~strcmpi(TheFiles(fileNum).folder,'H:\DoricData\CAG_eGFP\1500_um\082119\CE_FBR002')
+        if ~strcmpi(TheFiles(fileNum).folder,'E:\DoricData\CAG_eGFP\1500_um\082119\CE_FBR002')
             cd(TheFiles(fileNum).folder);
             filename=TheFiles(fileNum).name;
             [coeffVals,theEqn,goodness,stats]=Calibrate_Correction(filename);
@@ -44,6 +44,7 @@ for folderNum=1:size(subfolders,1)
     for filNum=1:size(FileList,1)
         cd(FileList(filNum).folder);
         filename=FileList(filNum).name;
+        CorrectionConst=-0.23;
         ExtractFPdata_003(filename,OpticalChannelNames,AnalogChannelNames,CorrectionConst);
     end
 end
