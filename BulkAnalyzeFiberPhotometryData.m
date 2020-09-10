@@ -1,5 +1,23 @@
-
 function BulkAnalyzeFiberPhotometryData
+%READ ME
+%This function will return a completed dataset from raw .csv files
+%collected using Doric fiberphotometry data acquisition systems
+%
+%%Filenaming Format:
+%%'ProjectIdentifier_AnimalNumber_Genotype_Fluorphore.csv'
+%
+%%Data Storage Format:
+%%'DriveName\DoricData\AnimalGenotype\ProbeDepth\Filename.csv'%
+
+%Embeded Functions
+%Calibrate_Correction
+%ExtractFPdata_003
+%FiberGroupAnimal
+%AssemblePopulationData_002
+%CreatePlotStruct
+%MakeDataTable
+%GLME_FiberData_Fixed
+%fiberphotometry_figures_004
 
 Home='E:\DoricData';
 GFPDir='E:\DoricData\CAG_eGFP';

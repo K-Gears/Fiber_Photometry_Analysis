@@ -1,4 +1,8 @@
 function [coeffVals,theEqn,goodness,stats]=Calibrate_Correction(filename)
+%READ ME
+%This function estimates the attenuation of eGFP signals due to increases
+%in blood volume using data recorded from CAG-EGFP mice in L5 of S1 cortex.
+
 close all
 directory=cd;
 folderBreaks=strfind(directory,'\');
