@@ -150,7 +150,7 @@ Smooth465=filtfilt(sos_final,g_final,Corrected465); %Bandpass filter data betwee
 Z465=(Smooth465-mean(Smooth465(OffsetStart:end)))/std(Smooth465(OffsetStart:end)); % Z score GCaMP data
 % SmoothData=filtfilt(sos_final,g_final,RescaleData);%Bandpass filter data between [0.01 and 1] Hz
 SmoothData=filtfilt(sos_final,g_final,RescaleData);%Bandpass filter data between [0.01 and 1] Hz
-Z560=(SmoothData(:,3)-mean(SmoothData(:,3)))/std(SmoothData(:,3)); % Z score TRITC data
+Z560=(SmoothData((OffsetStart:end),3)-mean(SmoothData((OffsetStart:end),3)))/std(SmoothData((OffsetStart:end),3)); % Z score TRITC data
 
 
 %% Z-score optical data
@@ -189,12 +189,12 @@ ZscoredFiberData=ZscoredFiberData((StartInd:end),:);
 LowPassData=LowPassData((StartInd:end),:);
 %% Cross Spectral Frequency Coherence
 params.fpass=[0.01 0.5];
-params.tapers=[19 37];
+params.tapers=[19 37]; %[19 37]
 
-% [C,phi,S12,S1,S2,f]=coherencyc(Z560,Z465,params);
-% ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
-% ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
-% ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
+[C,phi,S12,S1,S2,f]=coherencyc(Z560,Z465,params);
+ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
+ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
+ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
 
 % [C,phi,S12,S1,S2,f]=coherencyc(ZscoredFiberData(:,3),ZscoredFiberData(:,1),params);
 % ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{1}])=C;
