@@ -68,7 +68,7 @@ for folderNum=1:size(subfolders,1)
     for filNum=1:size(FileList,1)
         cd(FileList(filNum).folder);
         filename=FileList(filNum).name;
-        ExtractFPdata_003(filename,OpticalChannelNames,AnalogChannelNames,CorrectionConst);
+        ExtractFPdata_FC(filename,OpticalChannelNames,AnalogChannelNames,CorrectionConst);
     end
 end
 close all;
