@@ -72,19 +72,19 @@ clear PeakTime PeakVal xvals;
 
 %% Coherence CBV-GCaMP
 
-figure(14);set(gca,'XScale','log'); hold on;
-semilogx(FigureData.Xcorr.Coherence.(dataTypes{dataNum}).Freqs,FigureData.Xcorr.Coherence.(dataTypes{dataNum}).Coherence,'Color',FigureData.ColorMaps.cmap((dataNum+1),:),'LineStyle','-','Marker','none');
-
-if dataNum==length(dataTypes)
-    xlabel('Frequency(Hz)');
-    ylabel('Coherence squared');
-    title('Coherence blood volume  vs GCaMP');
-    legend(lgndTxt);
-    %     savefig(gcf,['Population_Coherence_LogFreq_CBV_GFP_' theDate]);
-    %     saveas(gcf,['Population_Coherence_LogFreq_CBV_GFP_' theDate],'epsc');
-end
-
-end    
+% figure(14);set(gca,'XScale','log'); hold on;
+% semilogx(FigureData.Xcorr.Coherence.(dataTypes{dataNum}).Freqs,FigureData.Xcorr.Coherence.(dataTypes{dataNum}).Coherence,'Color',FigureData.ColorMaps.cmap((dataNum+1),:),'LineStyle','-','Marker','none');
+% 
+% if dataNum==length(dataTypes)
+%     xlabel('Frequency(Hz)');
+%     ylabel('Coherence squared');
+%     title('Coherence blood volume  vs GCaMP');
+%     legend(lgndTxt);
+%     %     savefig(gcf,['Population_Coherence_LogFreq_CBV_GFP_' theDate]);
+%     %     saveas(gcf,['Population_Coherence_LogFreq_CBV_GFP_' theDate],'epsc');
+% end
+% 
+ end    
 clear dataTypes
     %% Signal to Noise
     

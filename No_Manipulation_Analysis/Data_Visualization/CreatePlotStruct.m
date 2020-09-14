@@ -2,17 +2,17 @@ function [FigureData]=CreatePlotStruct(GroupedData)
 %This function assembles all of the necessary data for plotting figures in
 %Echagarugga et al 2020.
 %% Useful Constants for data formatting
-[z,p,k]=butter(3,0.5/(0.5*GroupedData.CAG_eGFP.Params.DataFs),'low');
+[z,p,k]=butter(3,0.5/(0.5*GroupedData.hSyn_GCaMP6s.Params.DataFs),'low');
 [sos_ball,g_ball]=zp2sos(z,p,k);
 
-[z,p,k]=butter(3,1/(0.5*GroupedData.CAG_eGFP.Params.DataFs),'low');
+[z,p,k]=butter(3,1/(0.5*GroupedData.hSyn_GCaMP6s.Params.DataFs),'low');
 [sos_fbr,g_fbr]=zp2sos(z,p,k);
 %% Color Maps
 FigureData.ColorMaps.cmap=brewermap(12,'Set2');
 FigureData.ColorMaps.AnMap=brewermap(12,'Dark2');
 %% Five Second Locomotion Figure
 dataTypes=fieldnames(GroupedData);
-for dataNum=2:size(dataTypes,1)
+for dataNum=1:size(dataTypes,1) %Switch start ind to 2 if eGFP are in data set
 PeakVals=squeeze(GroupedData.(dataTypes{dataNum}).AveragedData.five_second_events.PeakResp);  
 
 FigureData.FiveSecFig.ResponseVol.(dataTypes{dataNum}).SingleAnimalAvg.GCaMP=PeakVals(2,:);
@@ -83,42 +83,42 @@ FigureData.FiveSecFig.SingleAnimalPlots.nNOS.AnAvg.CBV=AnimalAvg.AveragedData.fi
 FigureData.FiveSecFig.SingleAnimalPlots.nNOS.AnAvg.CBVStd=AnimalAvg.AveragedData.five_second_events.StdResp(:,3);
 
 %% Extended Locomotion Bar Plots
-for dataNum=2:size(dataTypes,1)
-    FigureData.ExtendedEvents.BarPlots.GCaMPAvg((dataNum-1),:)=[GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.PeakResp(2),GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.PeakResp(2),GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.PeakResp(2)];
-    FigureData.ExtendedEvents.BarPlots.CBVAvg((dataNum-1),:)=[GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.PeakResp(3),GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.PeakResp(3),GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.PeakResp(3)];
+for dataNum=1:size(dataTypes,1) %Switch start ind to 2 if eGFP are in data set
+    FigureData.ExtendedEvents.BarPlots.GCaMPAvg((dataNum),:)=[GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.PeakResp(2),GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.PeakResp(2)];%,GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.PeakResp(2)];
+    FigureData.ExtendedEvents.BarPlots.CBVAvg((dataNum),:)=[GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.PeakResp(3),GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.PeakResp(3)];%,GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.PeakResp(3)];
 end 
-for dataNum=2:size(dataTypes,1)
+for dataNum=1:size(dataTypes,1)%Switch start ind to 2 if eGFP are in data set
     PeakVals10s=squeeze(GroupedData.(dataTypes{dataNum}).AveragedData.ten_second_events.PeakResp);
     PeakVals15s=squeeze(GroupedData.(dataTypes{dataNum}).AveragedData.fifteen_second_events.PeakResp);
-    PeakVals30s=squeeze(GroupedData.(dataTypes{dataNum}).AveragedData.thirty_second_events.PeakResp);
+   % PeakVals30s=squeeze(GroupedData.(dataTypes{dataNum}).AveragedData.thirty_second_events.PeakResp);
     
-     FigureData.ExtendedEvents.BarPlots.(dataTypes{dataNum}).GCaMPVals=[PeakVals10s(2,:);PeakVals15s(2,:);PeakVals30s(2,:)];
-     FigureData.ExtendedEvents.BarPlots.(dataTypes{dataNum}).CBVVals=[PeakVals10s(3,:);PeakVals15s(3,:);PeakVals30s(3,:)];
+     FigureData.ExtendedEvents.BarPlots.(dataTypes{dataNum}).GCaMPVals=[PeakVals10s(2,:);PeakVals15s(2,:)];%PeakVals30s(2,:)];
+     FigureData.ExtendedEvents.BarPlots.(dataTypes{dataNum}).CBVVals=[PeakVals10s(3,:);PeakVals15s(3,:)];%PeakVals30s(3,:)];
 end
 
 %% Ten Second Event Averages
-for dataNum=2:size(dataTypes,1)
+for dataNum=1:size(dataTypes,1)%Switch start ind to 2 if eGFP are in data set
     FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).PlotTime=((1:length(GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.AvgResp))-GroupedData.(dataTypes{dataNum}).Params.StartPad)/GroupedData.(dataTypes{dataNum}).Params.DataFs;
     FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).GCaMP=GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.AvgResp(:,2);
     FigureData.ExtendedEvents.TenSecEventAvg.(dataTypes{dataNum}).CBV=GroupedData.(dataTypes{dataNum}).Averages.AveragedData.ten_second_events.AvgResp(:,3);
 end
 
 %% Fifteen Second Event Averages
-for dataNum=2:size(dataTypes,1)
+for dataNum=1:size(dataTypes,1)%Switch start ind to 2 if eGFP are in data set
     FigureData.ExtendedEvents.FifteenSecEventAvg.(dataTypes{dataNum}).PlotTime=((1:length(GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.AvgResp))-GroupedData.(dataTypes{dataNum}).Params.StartPad)/GroupedData.(dataTypes{dataNum}).Params.DataFs;
     FigureData.ExtendedEvents.FifteenSecEventAvg.(dataTypes{dataNum}).GCaMP=GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.AvgResp(:,2);
     FigureData.ExtendedEvents.FifteenSecEventAvg.(dataTypes{dataNum}).CBV=GroupedData.(dataTypes{dataNum}).Averages.AveragedData.fifteen_second_events.AvgResp(:,3);
 end
 
 %% Thirty Second Event Averages
-for dataNum=2:size(dataTypes,1)
+for dataNum=1:size(dataTypes,1)%Switch start ind to 2 if eGFP are in data set
     FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).PlotTime=((1:length(GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.AvgResp))-GroupedData.(dataTypes{dataNum}).Params.StartPad)/GroupedData.(dataTypes{dataNum}).Params.DataFs;
     FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).GCaMP=GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.AvgResp(:,2);
     FigureData.ExtendedEvents.ThirtySecEventAvg.(dataTypes{dataNum}).CBV=GroupedData.(dataTypes{dataNum}).Averages.AveragedData.thirty_second_events.AvgResp(:,3);
 end
 
 %% Cross Correlation
-for dataNum=2:size(dataTypes,1)
+for dataNum=1:size(dataTypes,1)%Switch start ind to 2 if eGFP are in data set
     FigureData.Xcorr.CrossCorr.(dataTypes{dataNum}).Lags=GroupedData.(dataTypes{dataNum}).Averages.Xcorr.Lags;
     FigureData.Xcorr.CrossCorr.(dataTypes{dataNum}).CorrCoeff=GroupedData.(dataTypes{dataNum}).Averages.Xcorr.CBV_GCaMP;
     

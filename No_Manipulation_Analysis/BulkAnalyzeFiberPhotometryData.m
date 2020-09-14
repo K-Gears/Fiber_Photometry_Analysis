@@ -75,7 +75,7 @@ close all;
 % Group multiple imaging sessions for each unique animal
 for folderNum=1:size(subfolders,1)
     cd([subfolders(folderNum).folder '\' subfolders(folderNum).name]);
-    FileList=dir(fullfile([subfolders(folderNum).folder '\' subfolders(folderNum).name],'**','CE_FBR*.mat'));
+    FileList=dir(fullfile([subfolders(folderNum).folder '\' subfolders(folderNum).name],'**','QZ_FBR*.mat'));
     for filNum=1:size(FileList,1)
         thebreaks=strfind(FileList(filNum).name,'_');
         Animal_Name{filNum}=FileList(filNum).name(1:(thebreaks(2)-1));
@@ -91,7 +91,7 @@ end
 
 %% Average animals in each subgroup
 cd(popDir);
-FileList=dir(fullfile(popDir,'**','CE_FBR*.mat'));
+FileList=dir(fullfile(popDir,'**','QZ_FBR*.mat'));
 for filnum=1:size(FileList,1)
     name_break=strfind(FileList(filnum).name,'_');
     AnimalGroup{filnum}=FileList(filnum).name((name_break(2)+1):(name_break(4)-1));
@@ -102,7 +102,7 @@ for proNum=1:size(Promoters,2)
     TempAnimals=FileList(filFind);
     for anNum=1:size(TempAnimals,1)
         thebreaks=strfind(TempAnimals(anNum).name,'_');
-        fiberDepth{anNum}=TempAnimals(anNum).name((thebreaks(4)+1):(thebreaks(6)-1));
+        fiberDepth{anNum}=TempAnimals(anNum).name((thebreaks(4)+1):(thebreaks(5)-1));%Changed end to 5 from 6 for QZ project
     end
     Depths=unique(fiberDepth);
     if proNum==1
@@ -122,10 +122,14 @@ theDate=strrep(theDate,'-','');
 theDate=strrep(theDate,' ','_');
 theDate=strrep(theDate,':','');
 cd(popDir);
+if exist('Fitdata','var')
 save(['GroupedData_' theDate '_FiberPhotometry'],'GroupedData','FitData','-v7.3');
+else
+save(['GroupedData_' theDate '_FiberPhotometry'],'GroupedData','-v7.3');  
+end
 
 %% Create Data structure for figures
-[FigureData]=CreatePlotStruct(GroupedData);
+[FigureData]=CreatePlotStruct(GroupedData); % Need to adapt for QZ Project
 
 %% Create/Apply Generalized Linear Model between datasets
 [Locomotion_Data_Table]=MakeDataTable_002(GroupedData,FigureData);

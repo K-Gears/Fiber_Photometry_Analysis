@@ -8,7 +8,7 @@ else
     GroupedData=[];
 end
 end
-depthBreak=strfind(DepthName,'_');
+depthBreak=strfind(DepthName,'u'); %changed from '_' to 'u' for QZ project
 depthVal=str2double(DepthName(1:(depthBreak(1)-1)));
 if depthVal>=1200
     DepthName='Deep';
@@ -57,7 +57,7 @@ for anNum=1:size(AnimalFiles,1)
                     if strcmpi(subfields{subNum},'RawFiberData')
                         GroupedData.(proName).Averages.(subfields{subNum}).(datafields{dataNum})=median(GroupedData.(proName).(subfields{subNum}).(datafields{dataNum}),3);
                     else
-                        GroupedData.(proName).Averages.(subfields{subNum}).(datafields{dataNum})=mean(GroupedData.(proName).(subfields{subNum}).(datafields{dataNum}),3);
+                        GroupedData.(proName).Averages.(subfields{subNum}).(datafields{dataNum})=nanmean(GroupedData.(proName).(subfields{subNum}).(datafields{dataNum}),3);
                     end
                 end
             end

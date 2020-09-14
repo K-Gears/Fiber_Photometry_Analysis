@@ -158,10 +158,10 @@ LowPassData=LowPassData((StartInd:end),:);
 params.fpass=[0.01 0.5];
 params.tapers=[19 37];
 
-[C,phi,S12,S1,S2,f]=coherencyc(Z560(OffsetStart:end),Z465(OffsetStart:end),params);
-ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
-ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
-ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
+% [C,phi,S12,S1,S2,f]=coherencyc(Z560(OffsetStart:end),Z465(OffsetStart:end),params);
+% ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
+% ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
+% ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
 
 % [C,phi,S12,S1,S2,f]=coherencyc(ZscoredFiberData(:,3),ZscoredFiberData(:,1),params);
 % ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{1}])=C;
