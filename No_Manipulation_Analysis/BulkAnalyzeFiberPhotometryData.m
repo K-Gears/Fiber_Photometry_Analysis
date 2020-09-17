@@ -26,9 +26,9 @@ OpticalChannelNames={'Control','GCaMP6s','BloodVolume'};
 popDir='H:\QZ_FBR_FC_Data\PopulationData';
 %% Get correction for Hemodynamic attenuation of GFP signal
 cd(GFPDir);
-if exist('Hemodynamic_Correction_Constant.mat','file')
-    load('Hemodynamic_Correction_Constant.mat');
-else
+% if exist('Hemodynamic_Correction_Constant.mat','file')
+%     load('Hemodynamic_Correction_Constant.mat');
+% else
 depthFolders=dir;
 depthFolders(~[depthFolders.isdir])=[];
 tf=ismember({depthFolders.name},{'.','..'});
@@ -40,22 +40,25 @@ for foldNum=1:size(depthFolders)
         if ~strcmpi(TheFiles(fileNum).folder,'E:\DoricData\CAG_eGFP\1500_um\082119\CE_FBR002')
             cd(TheFiles(fileNum).folder);
             filename=TheFiles(fileNum).name;
-            [coeffVals,theEqn,goodness,stats]=Calibrate_Correction(filename);
+            [coeffVals,theEqn,goodness,stats,correctionConstant_xcorr]=Calibrate_Correction(filename);
             FitData(fileNum).coeffVals=coeffVals;
             FitData(fileNum).fitEqn=theEqn;
             FitData(fileNum).GoodnessofFit=goodness;
             FitData(fileNum).Stats=stats;
-            Slope(fileNum)=FitData(fileNum).coeffVals(1);   
+            FitData(fileNum).correctionConst_xcorr=correctionConstant_xcorr;
+            Slope(fileNum)=FitData(fileNum).coeffVals(1);
+            Slope_xcorr(fileNum)=correctionConstant_xcorr;
         end
         if fileNum==size(TheFiles,1)
             Slope(Slope>=0)=NaN;
             CorrectionConst=nanmean(Slope);
+            xcorrConst=mean(Slope_xcorr);
         end
     end
 end
-cd(GFPDir);
-save('Hemodynamic_Correction_Constant','CorrectionConst');
-end
+% cd(GFPDir);
+% save('Hemodynamic_Correction_Constant','CorrectionConst');
+% end
 cd(Home);
 subfolders=dir;
 subfolders(~[subfolders.isdir])=[];

@@ -8,11 +8,31 @@ cd(VideoFolder);
 VideoFiles=dir('*.avi');
 
 for filNum=1:size(VideoFiles,1)
+%     theBreaks=strfind(VideoFiles(filNum).name,'-');
+%     theDot=strfind(VideoFiles(filNum).name,'.');
+%     filInd=str2double(VideoFiles(filNum).name((theBreaks(2)+1):(theDot-1)))+1;
+%     if filInd<10
+%         filID=['00',num2str(filInd)];
+%     elseif filInd>=10 && filInd<100
+%         filID=['0',num2str(filInd)];
+%     else
+%         filID=num2str(filInd);
+%     end
+%     videoName=[VideoFiles(filNum).name(1:(theBreaks(1)-1)) '_' filID '.avi'];
+%     newVid=VideoWriter(videoName);
+%     newVid.Quality=100;
     VidObj=VideoReader(VideoFiles(filNum).name); %Create an object containing video data and metadata
     frameWidth=VidObj.Width;
     frameHeight=VidObj.Height;
-    frameCount=VidObj.NumFrames;
+    frameCount(filNum)=VidObj.NumFrames;
     frameRate=round(VidObj.FrameRate);
+    timeStamp(filNum)=VidObj.CurrentTime;
+%     newVid.FrameRate=VidObj.FrameRate;
+%     open(newVid);
+%     for frameNum=1:frameCount
+%     writeVideo(newVid,read(VidObj,frameNum));
+%     end
+%     close(newVid);
     [z,p,k]=butter(3,5/(0.5*frameRate),'low');
     [sos_whisk,g_whisk]=zp2sos(z,p,k);
     if filNum==1

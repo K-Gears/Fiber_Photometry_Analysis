@@ -1,4 +1,4 @@
-function [coeffVals,theEqn,goodness,stats]=Calibrate_Correction(filename)
+function [coeffVals,theEqn,goodness,stats,correctionConstant_xcorr]=Calibrate_Correction(filename)
 %READ ME
 %This function estimates the attenuation of eGFP signals due to increases
 %in blood volume using data recorded from CAG-EGFP mice in L5 of S1 cortex.
@@ -94,6 +94,8 @@ for q=1:size(LowPassData,2)
 RescaleData(:,q)=rescale(LowPassData(:,q),0,1); %rescale all data between 0 to 1
 end
 
+%% Correct hemodynamic signal by minimizing correlation coefficient at zero lag
+[correctionConstant_xcorr]= MinimizeCorrCoeff(RescaleData(:,2),RescaleData(:,3),ChunkData.Params.DataFs);
 %% Model hemodynamic response attenuation of GCaMP signal
 BinEdges=(-1:0.005:1);
 figure(99);scatter(RescaleData(:,3),RescaleData(:,2));
