@@ -23,6 +23,7 @@ for folderNum=1:size(subfolders,1)
     tf=ismember({anFolders.name},{'.','..'});
     anFolders(tf)=[];
     for anNum=1:size(anFolders,1)
+        close all
         cd([anFolders(anNum).folder '\' anFolders(anNum).name]);
         thebreaks=strfind(anFolders(anNum).folder,'\');
         anName=anFolders(anNum).name;
