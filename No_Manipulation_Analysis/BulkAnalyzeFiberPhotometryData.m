@@ -40,12 +40,14 @@ for foldNum=1:size(depthFolders)
         if ~strcmpi(TheFiles(fileNum).folder,'E:\DoricData\CAG_eGFP\1500_um\082119\CE_FBR002')
             cd(TheFiles(fileNum).folder);
             filename=TheFiles(fileNum).name;
-            [coeffVals,theEqn,goodness,stats,correctionConstant_xcorr]=Calibrate_Correction(filename);
+            [coeffVals,theEqn,goodness,stats,correctionConstant_xcorr,initCorrCoeffs,adjCorrCoeffs]=Calibrate_Correction(filename);
             FitData(fileNum).coeffVals=coeffVals;
             FitData(fileNum).fitEqn=theEqn;
             FitData(fileNum).GoodnessofFit=goodness;
             FitData(fileNum).Stats=stats;
-            FitData(fileNum).correctionConst_xcorr=correctionConstant_xcorr;
+            FitData(fileNum).minXcorr.correctionConst_xcorr=correctionConstant_xcorr;
+            FitData(fileNum).minXcorr.initCorrCoeffs=initCorrCoeffs;
+            FitData(fileNum).minXcorr.adjCorrCoeffs=adjCorrCoeffs;
             Slope(fileNum)=FitData(fileNum).coeffVals(1);
             Slope_xcorr(fileNum)=correctionConstant_xcorr;
         end

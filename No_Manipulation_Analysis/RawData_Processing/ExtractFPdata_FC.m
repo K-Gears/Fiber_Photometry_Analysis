@@ -116,8 +116,9 @@ OffsetStart=60*ChunkData.Params.DataFs; %Removes filtering artifact at start of 
 for q=1:size(LowPassData,2)
 RescaleData(:,q)=rescale(LowPassData(:,q),0,1); %rescale all data between 0 to 1
 end
-[correctionConstant]= MinimizeCorrCoeff(RescaleData(:,2),RescaleData(:,3),ChunkData.Params.DataFs);
-Corrected465=RescaleData(:,2)-(CorrectionConst*RescaleData(:,3)); % Add rescaled TRITC signal to GCaMP signal
+[correctionConstant,initCorrCoeffs,adjCorrCoeffs]= MinimizeCorrCoeff(RescaleData(:,2),RescaleData(:,3),ChunkData.Params.DataFs);
+Corrected465=RescaleData(:,2)+(correctionConstant*RescaleData(:,3));
+% Corrected465=RescaleData(:,2)-(CorrectionConst*RescaleData(:,3)); % Add rescaled TRITC signal to GCaMP signal
 Smooth465=filtfilt(sos_final,g_final,Corrected465);%RescaleData(:,2)); %Bandpass filter data between [0.01 and 1] Hz
 Z465=(Smooth465-mean(Smooth465(OffsetStart:end)))/std(Smooth465(OffsetStart:end)); % Z score GCaMP data
 % SmoothData=filtfilt(sos_final,g_final,RescaleData);%Bandpass filter data between [0.01 and 1] Hz

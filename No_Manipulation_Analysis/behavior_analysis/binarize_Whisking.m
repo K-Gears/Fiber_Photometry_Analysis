@@ -4,35 +4,27 @@ function [binWhisk]=binarize_Whisking(VideoFolder,binThresh,varargin)
 % whisking behavior in to a binary Whisking (1) or not Whisking(0) vector
 % for analysis of imaging and electrophysiology data.
 
+%% TO DO LIST
+% add input to add ROI name
+% add ability to output ROI mask
+% add multi ROI compatibility
+
+
+
+%% Load behavior camera videos
 cd(VideoFolder);
 VideoFiles=dir('*.avi');
 
 for filNum=1:size(VideoFiles,1)
-%     theBreaks=strfind(VideoFiles(filNum).name,'-');
-%     theDot=strfind(VideoFiles(filNum).name,'.');
-%     filInd=str2double(VideoFiles(filNum).name((theBreaks(2)+1):(theDot-1)))+1;
-%     if filInd<10
-%         filID=['00',num2str(filInd)];
-%     elseif filInd>=10 && filInd<100
-%         filID=['0',num2str(filInd)];
-%     else
-%         filID=num2str(filInd);
-%     end
-%     videoName=[VideoFiles(filNum).name(1:(theBreaks(1)-1)) '_' filID '.avi'];
-%     newVid=VideoWriter(videoName);
-%     newVid.Quality=100;
+    %     theBreaks=strfind(VideoFiles(filNum).name,'-');
+    %     theDot=strfind(VideoFiles(filNum).name,'.');
+    %     filInd=str2double(VideoFiles(filNum).name((theBreaks(2)+1):(theDot-1)))+1;
     VidObj=VideoReader(VideoFiles(filNum).name); %Create an object containing video data and metadata
     frameWidth=VidObj.Width;
     frameHeight=VidObj.Height;
     frameCount(filNum)=VidObj.NumFrames;
     frameRate=round(VidObj.FrameRate);
     timeStamp(filNum)=VidObj.CurrentTime;
-%     newVid.FrameRate=VidObj.FrameRate;
-%     open(newVid);
-%     for frameNum=1:frameCount
-%     writeVideo(newVid,read(VidObj,frameNum));
-%     end
-%     close(newVid);
     [z,p,k]=butter(3,5/(0.5*frameRate),'low');
     [sos_whisk,g_whisk]=zp2sos(z,p,k);
     if filNum==1
@@ -43,22 +35,26 @@ for filNum=1:size(VideoFiles,1)
         whiskerROI=drawrectangle;
         confirm=input('Is ROI correct? (y/n)','s');
         if strcmpi(confirm,'y')
-        theMask=createMask(whiskerROI);
+            theMask=createMask(whiskerROI);
         else
-         whiskerROI=drawrectangle;
-         theMask=createMask(whiskerROI);
+            delete(whiskerROI);
+            whiskerROI=drawrectangle;
+            theMask=createMask(whiskerROI);
         end
     end
     for frameNum=2:frameCount
         if frameNum==2
-        leadFrame=read(VidObj,(frameNum-1));
-        leadFramebin=double(leadFrame(:,:,1)).*theMask;
+            leadFrame=read(VidObj,(frameNum-1));
+            leadFramebin=double(leadFrame(:,:,1)).*theMask;
         else
-        leadFramebin=followFramebin;
+            leadFramebin=followFramebin;
         end
         followFrame=read(VidObj,frameNum);
         followFramebin=double(followFrame(:,:,1)).*theMask;
-        theDelta((frameNum-1),filNum)=sum(abs(followFramebin-leadFramebin),'all');
+        if frameNum==2
+            theDelta((frameNum-1),filNum)=sum(abs(followFramebin-leadFramebin),'all');%duplicate first difference to prevent temporal shift for each file
+        end
+        theDelta((frameNum),filNum)=sum(abs(followFramebin-leadFramebin),'all');
     end
 end
 smoothDelta=reshape(filtfilt(sos_whisk,g_whisk,theDelta),1,numel(theDelta));
