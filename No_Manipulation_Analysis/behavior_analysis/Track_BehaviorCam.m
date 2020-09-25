@@ -105,6 +105,7 @@ fprintf(['Finished tracking ' num2str(filNum) ' of ' num2str(size(VideoFiles,1))
         clear theDelta
         cd(folderTracking);
         save([anName '_' thedate '_behaviorTracking.mat'],'trackCam','-v7.3'); %save movement tracking to be binarized later.
+        clear trackCam
     end
 end
 end
