@@ -1,4 +1,4 @@
-function [binBehavior,new_eventInds,movementThresh]=binarize_BehaviorCam(movementData,restDur,eventDur,movementThresh,varargin)
+function [binBehavior,new_eventInds,movementThresh]=binarize_BehaviorCam(movementData,restDur,eventDur,roiName,movementThresh,varargin)
 %This function converts ROI calculated movement data in to binarized
 %behaving(1) quiescent(0) bins based on a user defined threshold and
 %returns the indicies of events using user defined event length duration
@@ -17,11 +17,19 @@ function [binBehavior,new_eventInds,movementThresh]=binarize_BehaviorCam(movemen
 
 %% Define threshold if not an input
 if ~exist('movementThresh','var')
-    Fs=30;
-    plotTime=(1:length(movementData))/Fs;
-    figure;plot(plotTime,movementData);
-    xlim([0 7200]); xlabel('Time (s)');
-    movementThresh=input('Define threshold for binarizing movement');
+    threshok='n';
+    while strcmpi(threshok,'n')
+        close all
+        Fs=30;
+        plotTime=(1:length(movementData))/Fs;
+        figure; hold on;plot(plotTime,movementData,'k');
+        xlim([0 7200]); xlabel('Time (s)');
+        title(['Select acceleration threshold for binarizing movement of ' roiName '.']);
+        movementThresh=input('Define threshold for binarizing movement');
+        plotThresh(1:length(plotTime))=movementThresh;
+        plot(plotTime,plotThresh,'--r');
+        threshok=input('Is threshold ok? (y/n)','s');
+    end
 end
 
 %% Binarize behavior
@@ -48,6 +56,7 @@ end
 [eventInds,restInds]=getInds(final_binBehavior,movementData);
 
 %% Get event inds to be used for behavior chunking
+new_eventInds=[];
 eventCount=1;
 if restInds(1,1)<eventInds(1,1)
     for eventNum=1:size(eventInds,2)

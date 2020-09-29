@@ -24,6 +24,7 @@ GFPDir='H:\DoricData\CAG_eGFP';
 AnalogChannelNames={'RotaryEncoder'};
 OpticalChannelNames={'Control','GCaMP6s','BloodVolume'};
 popDir='H:\QZ_FBR_FC_Data\PopulationData';
+folderTracking='H:\BehaviorCameraTracks';
 %% Get correction for Hemodynamic attenuation of GFP signal
 cd(GFPDir);
 % if exist('Hemodynamic_Correction_Constant.mat','file')
@@ -73,7 +74,21 @@ for folderNum=1:size(subfolders,1)
     for filNum=1:size(FileList,1)
         cd(FileList(filNum).folder);
         filename=FileList(filNum).name;
-        ExtractFPdata_FC(filename,OpticalChannelNames,AnalogChannelNames,CorrectionConst);
+        theBreaks=strfind(filename,'_');
+        anName=filename(1:(theBreaks(2)-1));
+        theSlash=strfind(FileList(filNum).folder,'\');
+        filDate=FileList(filNum).folder((theSlash(end)+1):end);
+        trackFile=[anName '_' filDate '_behaviorTracking.mat'];
+        cd(folderTracking);
+        if exist(trackFile,'file')
+           trackData=load(trackFile);
+        else
+            fprintf('This file does not have behavior camera data\n')
+            pause
+        end
+        cd(FileList(filNum).folder);
+        correctFlag='n'; %If GCaMP signals need to be corrected for hemodynamic attenuation =='y' 
+        ExtractFPdata_FC(filename,OpticalChannelNames,AnalogChannelNames,trackData.trackCam,correctFlag);
     end
 end
 close all;
