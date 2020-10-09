@@ -64,8 +64,18 @@ for folderNum=1:size(subfolders,1)
             for roiNum=1:size(roiNames,1) 
                 maskVid=theVid.*roiMat.(roiNames{roiNum})(:,:,(1:size(theVid,3)));
                 diffVid=sum(sum(abs(diff(maskVid,1,3)),1),2);
-                theDelta.(roiNames{roiNum})(1,filNum)=diffVid(1);
-                theDelta.(roiNames{roiNum})((2:length(diffVid)+1),filNum)=diffVid;
+%                 if filNum<6
+                    theDelta.(roiNames{roiNum})(1,filNum)=diffVid(1);
+                    theDelta.(roiNames{roiNum})((2:length(diffVid)+1),filNum)=diffVid;
+%                 elseif filNum==6
+%                     theDelta.(roiNames{roiNum})((1:length(diffVid)+1),filNum)=0;
+%                     theDelta.(roiNames{roiNum})(1,(filNum+1))=diffVid(1);
+%                     theDelta.(roiNames{roiNum})((2:length(diffVid)+1),(filNum+1))=diffVid;
+%                 else
+%                     theDelta.(roiNames{roiNum})(1,(filNum+1))=diffVid(1);
+%                     theDelta.(roiNames{roiNum})((2:length(diffVid)+1),(filNum+1))=diffVid;
+%                 end
+                    
                 clear maskVid diffVid
             end
             Process_whole_trial_time=toc(wholeFile)

@@ -167,10 +167,10 @@ LowPassData=LowPassData((StartInd:end),:);
 params.fpass=[0.01 0.5];
 params.tapers=[19 37];
 
-% [C,phi,S12,S1,S2,f]=coherencyc(ZscoredFiberData(:,3),ZscoredFiberData(:,2),params);
-% ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
-% ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
-% ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
+[C,phi,S12,S1,S2,f]=coherencyc(ZscoredFiberData(:,3),ZscoredFiberData(:,2),params);
+ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=C;
+ChunkData.FrequencyDomain.(['Phase_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=phi;
+ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{3} '_' OpticalChannelNames{2}])=f;
 
 % [C,phi,S12,S1,S2,f]=coherencyc(ZscoredFiberData(:,3),ZscoredFiberData(:,1),params);
 % ChunkData.FrequencyDomain.(['Coherence_' OpticalChannelNames{3} '_' OpticalChannelNames{1}])=C;
@@ -183,7 +183,7 @@ params.tapers=[19 37];
 % ChunkData.FrequencyDomain.(['Frequency_' OpticalChannelNames{2} '_' OpticalChannelNames{1}])=f;
 
 %% Binarize locomotion data
-[imp_bin]=velocity_binarize_fiberphotometry(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-5);
+[imp_bin]=velocity_binarize_fiberphotometry(WheelData,ChunkData.Params.DataFs,ChunkData.Params.DataFs,1e-4);
 
 %% Cross correlation analysis
 ExpectedLength=(ChunkData.Params.DataFs*ChunkData.Params.DataSeconds)-StartInd;
@@ -276,15 +276,17 @@ for durNum=1:length(RunDuration)
 end
 
 %% ROI defined behavior triggered averaging
+locoTimes=find(imp_bin==1); 
 roiNames=fieldnames(trackingData.binarizedData);
 eventDuration=[2 5 10 15 30 45];
 eventLengths={'two_second_events','five_second_events','ten_second_events','fifteen_second_events','thirty_second_events','fortyfive_second_events'};
 LeadTime=5;
 ChunkData.Params.behavior_camFs=length(trackingData.Tracking.(roiNames{1}).smoothTracking)/ChunkData.Params.DataSeconds;
 for roiNum=1:size(roiNames,1)
+    behaviorLabel=[roiNames{roiNum} 'EvokedData'];
     if ~isempty(trackingData.binarizedData.(roiNames{roiNum}).behaviorInds)
         EventLengths=(trackingData.binarizedData.(roiNames{roiNum}).behaviorInds(2,:)-trackingData.binarizedData.(roiNames{roiNum}).behaviorInds(1,:))/ChunkData.Params.behavior_camFs;
-        behaviorLabel=[roiNames{roiNum} 'EvokedData'];
+        
         for durNum=1:length(eventDuration)
             behaviorEvents=[];
             eventLabel=eventLengths{durNum};
@@ -300,7 +302,17 @@ for roiNum=1:size(roiNames,1)
             end
             [row,col]=find(EventInds<=(60*ChunkData.Params.DataFs));
             EventInds(:,col)=[];
-            EventInds=EventInds-(60*ChunkData.Params.DataFs);
+            EventInds=EventInds-(60*ChunkData.Params.DataFs);           
+            if strcmpi(roiNames{roiNum},'Whiskers')
+                for eventNum=1:size(EventInds,2)
+                eventFrames=EventInds(1,eventNum):EventInds(2,eventNum);
+                if max(ismember(eventFrames,locoTimes))
+                    whiskTag{eventNum}='Active_Whisking';
+                else
+                    whiskTag{eventNum}='Quiescent_Whisking';
+                end
+                end
+            end
             for k=1:size(EventInds,2)
                 StartInd=EventInds(1,k)-ChunkData.Params.StartPad;
                 if durNum==length(eventDuration)
@@ -315,6 +327,9 @@ for roiNum=1:size(roiNames,1)
                         for j=1:size(Baseline,2)
                             behaviorEvents(:,j,k)=ZscoredFiberData((StartInd:EndInd),j)-Baseline(j);
                             behaviorEventsRaw(:,j,k)=LowPassData((StartInd:EndInd),j)-BaselineRaw(j);
+                            if strcmpi(roiNames{roiNum},'Whiskers')
+                            keepWhisk{k}=whiskTag{k};
+                            end
                         end
                     end
                 end
@@ -348,6 +363,19 @@ for roiNum=1:size(roiNames,1)
                 ChunkData.(behaviorLabel).binData.binTracking=trackingData.binarizedData.(roiNames{roiNum}).binBehavior;
                 ChunkData.(behaviorLabel).binData.eventInds=trackingData.binarizedData.(roiNames{roiNum}).behaviorInds;
                 ChunkData.(behaviorLabel).binData.binThresh=trackingData.binarizedData.(roiNames{roiNum}).behaviorThresh;
+                if strcmpi(roiNames{roiNum},'Whiskers')
+                    ChunkData.(behaviorLabel).(roiNames{roiNum}).(eventLabel).whiskTag=whiskTag;
+                    tagTypes=unique(whiskTag);
+                    for tagNum=1:size(tagTypes,2)
+                        tagInds=strcmpi(keepWhisk,tagTypes{tagNum});
+                        tagEvents=behaviorEvents(:,:,tagInds);
+                        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).AvgResp=mean(tagEvents,3);
+                        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).StdResp=std(tagEvents,0,3);
+                        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).MedResp=median(tagEvents,3);
+                        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).BaseResp=mean(ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).AvgResp((1:(3*ChunkData.Params.DataFs)),:),1);
+                        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).PeakResp=mean(ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).(tagTypes{tagNum}).AvgResp(PeakInds,:),1);
+                    end    
+                end    
             else
                 ChunkData.WheelData.(roiNames{roiNum}).(eventLabel).RunInds=[];
                 ChunkData.WheelData.(roiNames{roiNum}).(eventLabel).RunLengths=[];
@@ -367,20 +395,23 @@ for roiNum=1:size(roiNames,1)
                 ChunkData.(behaviorLabel).binData.binThresh=trackingData.binarizedData.(roiNames{roiNum}).behaviorThresh;
             end
             
-            clear behaviorEvents behaviorEventsRaw
+            clear behaviorEvents behaviorEventsRaw whiskTag keepWhisk
         end
     else
-        ChunkData.WheelData.(roiNames{roiNum}).(eventLabel).RunInds=[];
-        ChunkData.WheelData.(roiNames{roiNum}).(eventLabel).RunLengths=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).AvgResp=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).StdResp=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).MedResp=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).BaseResp=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).PeakResp=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).PeakVal=[];
-        ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).PeakTime=[];
-        ChunkData.(behaviorLabel).(eventLabel).OpticalData=[];
-        ChunkData.(behaviorLabel).(eventLabel).OpticalDataRaw=[];
+        for durNum=1:length(eventDuration)
+            eventLabel=eventLengths{durNum};
+            ChunkData.WheelData.(roiNames{roiNum}).(eventLabel).RunInds=[];
+            ChunkData.WheelData.(roiNames{roiNum}).(eventLabel).RunLengths=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).AvgResp=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).StdResp=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).MedResp=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).BaseResp=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).PeakResp=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).PeakVal=[];
+            ChunkData.AveragedData.(roiNames{roiNum}).(eventLabel).PeakTime=[];
+            ChunkData.(behaviorLabel).(eventLabel).OpticalData=[];
+            ChunkData.(behaviorLabel).(eventLabel).OpticalDataRaw=[];
+        end
         ChunkData.(behaviorLabel).roiTracks.rawTrack=trackingData.Tracking.(roiNames{roiNum}).rawTracking;
         ChunkData.(behaviorLabel).roiTracks.smoothTrack=trackingData.Tracking.(roiNames{roiNum}).smoothTracking;
         ChunkData.(behaviorLabel).binData.binTracking=trackingData.binarizedData.(roiNames{roiNum}).binBehavior;
